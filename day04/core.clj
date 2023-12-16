@@ -1,16 +1,9 @@
 (ns day04.core
   (:require [clojure.string :as s]
             [clojure.set :as set]
-            [clojure.math :as math]))
+            [clojure.math :as math]
+            [lib :refer (parse-ints)]))
 
-(defn parse-ints [s]
-  (->>
-   (s/split s #"\s+")
-   (filter (complement s/blank?))
-   (mapv s/trim)
-   (mapv parse-long)))
-
-(parse-ints "  12 2   2   2")
 (defn parse [line]
   (let [[_ card win have] (re-matches #"Card +(\d+):([ \d]+)\|([ \d]+)" line)]
     {:card (parse-long card)
