@@ -3,6 +3,36 @@
             [clojure.test :refer [is]]))
 
 
+(defn- split-by* [pred coll]
+  (let [xs (take-while (complement pred) coll)
+        ys (drop-while (complement pred) coll)]
+    (cond (seq xs)
+          [xs ys]
+
+          (seq ys)
+          [[(first ys)] (rest ys)]
+
+          :else
+          [])))
+
+(defn split-by [pred coll]
+  (loop [coll coll
+         result []]
+    (let [[xs ys] (split-by* pred coll)]
+      (cond
+        (empty? xs)
+        result
+        (empty? ys)
+        (conj result xs)
+        :else
+        (recur ys (conj result xs))))))
+
+
+(is (= [] (split-by zero? [])))
+(is (= [[0] [0]] (split-by zero? [0 0])))
+(is (= [[1] [0] [2 2] [0] [0] [3 3 3] [0]] (split-by zero? [1 0 2 2 0 0 3 3 3 0])))
+
+
 (defn parse-ints [s]
   (->>
    (s/split s #"\s+")
