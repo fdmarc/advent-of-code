@@ -32,3 +32,86 @@
 
 (is (= 1320 (part-1 (slurp "day15/example.txt"))))
 (is (= 511343 (part-1 (slurp "day15/input.txt"))))
+
+
+(defn ->instruction [s]
+  (if-let [m (re-find #"(\w+)=(\d+)" s)]
+    {:op \=
+     :input s
+     :focal-length (parse-long (last m))
+     :label (second m)}
+    {:op \-
+     :input s
+     :label (subs s 0 (dec (count s)))}))
+
+(defn with-box [{:keys [label] :as step}]
+  (assoc step :box (elf-hash label)))
+
+(defn parse [input]
+  (->> #","
+       (s/split input)
+       (mapv ->instruction)
+       (mapv with-box)))
+
+
+(defmulti operate* (fn [_box {:keys [op]}] op))
+
+(defmethod operate* \- [box {:keys [label]}]
+  (vec (remove (fn [lens] (= (:label lens) label))
+               box)))
+
+(defmethod operate* \= [box {:keys [label] :as step}]
+  (let [labels (set (mapv :label box))]
+    (if (contains? labels label)
+      (mapv
+       (fn [lens]
+         (if (= (:label lens) (:label step))
+           step
+           lens))
+
+       box)
+      (conj box step))))
+
+(defn display-lens [lens]
+  (format "[%s %s]" (:label lens) (:focal-length lens)))
+
+(defn display [step boxes]
+  (apply str
+         (format "After \"%s\"\n" (:input step))
+
+         (map-indexed (fn [idx box]
+                        (when (seq box)
+                          (format "Box %d: %s\n" idx (s/join " " (map display-lens box)))))
+                      boxes)))
+
+
+(defn operate [boxes {:keys [box] :as step}]
+  (let [result (update boxes box operate*  step)]
+    #_(println (display step result))
+    result))
+
+(defn score* [box-index box]
+  (map-indexed (fn [slot-index {:keys [label focal-length]}]
+                 (let [power (* (inc box-index)
+                                (inc slot-index)
+                                focal-length)]
+                   (printf "%s: %d (box %d) * %d (slot) * %d (focal length) = %d\n"
+                            label (inc box-index) box-index (inc slot-index) focal-length
+                            power)
+
+                   power))
+               box))
+
+(defn score [boxes]
+  (reduce + (apply concat (map-indexed score* boxes))))
+
+
+(defn part-2 [input]
+  (let [steps (parse input)]
+    (println (score (reduce operate (vec (repeat 256 [])) steps)))))
+
+
+
+
+(part-2 (slurp "day15/example.txt"))
+(part-2 (slurp "day15/input.txt"))
