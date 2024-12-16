@@ -1,3 +1,15 @@
 {
-    "clojure.trace.server": "verbose"
+    "clojure.trace.server": "verbose",
+    "calva.autoStartRepl": true,
+    "calva.enableInspectorRainbow": true,
+    "calva.useLegacyReplWindowPath": false,
+    "calva.referencesCodeLens.enabled": false,
+    "calva.replConnectSequences": [
+        {
+            "name": "Autoselect deps.edn",
+            "projectType": "deps.edn",
+            "autoSelectForConnect": true,
+            "projectRootPath": ["."]
+        }
+    ]
 }

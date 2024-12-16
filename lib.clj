@@ -71,3 +71,8 @@
 
 (defn lcmv [& v]
   (reduce lcm v))
+
+(defn flatten-1 [seq-of-seqs]
+  (vec (apply concat seq-of-seqs)))
+
+
