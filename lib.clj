@@ -75,4 +75,17 @@
 (defn flatten-1 [seq-of-seqs]
   (vec (apply concat seq-of-seqs)))
 
-
+(defn character-map [s]
+  (let [lines (s/split-lines s)
+        positions
+        (flatten-1
+         (map-indexed
+          (fn [row line]
+            (map-indexed
+             (fn [col char]
+               [[row col] char])
+             line))
+          lines))]
+    {:locs (into {} positions)
+     :cols (-> lines first count)
+     :rows (count lines)}))
