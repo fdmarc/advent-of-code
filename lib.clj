@@ -89,3 +89,25 @@
     {:locs (into {} positions)
      :cols (-> lines first count)
      :rows (count lines)}))
+
+
+(defn slurp-lines [path]
+  (into [] (s/split-lines (slurp path))))
+
+(defn digit->long [ch]
+  (long (Character/digit ch 10)))
+
+(is (= 7 (digit->long \7)))
+
+(defn index-of [needle haystack]
+  (loop [[it & more] haystack
+         index 0]
+    (cond
+      (= it needle) index
+      more (recur more (inc index))
+      :else -1)))
+
+(is (= 0 (index-of :a [:a :b :c])))
+(is (= 2 (index-of :c [:a :b :c])))
+(is (= -1 (index-of :d [:a :b :c])))
+(is (= -1 (index-of :d [])))
